@@ -1,7 +1,5 @@
 package com.jungle.board.interfaces.user.model;
 
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,5 +16,5 @@ public class UserProfileResponse {
     private String name;
     private String nickname;
     private String email;
-    private Date joinedAt;
+    private String joinedAt;
 }

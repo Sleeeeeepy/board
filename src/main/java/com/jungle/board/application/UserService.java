@@ -1,5 +1,8 @@
 package com.jungle.board.application;
 
-public class UserService {
+import com.jungle.board.domain.user.User;
 
+public interface UserService {
+    User signUp(User user);
+    User getUser(long id);
 }
