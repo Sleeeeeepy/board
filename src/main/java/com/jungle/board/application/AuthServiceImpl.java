@@ -51,4 +51,12 @@ public class AuthServiceImpl implements AuthService {
 
         return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }
+
+    @Override
+    public void verifyUser(Long userId, String token) {
+        var claims = this.jwtTokenProvider.parseAccessToken(token);
+        if (!claims.getPayload().getSubject().equals(userId.toString())) {
+            throw new WebException("Invaild token");
+        }
+    }
 }
