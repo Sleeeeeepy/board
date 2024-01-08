@@ -17,7 +17,8 @@ public class PostResponse {
     private long authorId;
     private String title;
     private String body;
-    private String thumbnailUrl;
     private Date updatedAt;
     private Date createdAt;
+    private String thumbnailUrl; 
+    private long likes; 
 }

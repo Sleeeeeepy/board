@@ -6,15 +6,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.jungle.board.common.WebException;
 import com.jungle.board.interfaces.exception.model.ExceptionResponse;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(WebException.class)
     @ResponseBody
-    public ResponseEntity<ExceptionResponse> handleRuntimeException(RuntimeException e) {
-        int code = 500;
-        var response = ExceptionResponse.builder().code(code).message("Internal Server Error").build();
+    public ResponseEntity<ExceptionResponse> handleRuntimeException(WebException e) {
+        int code = e.getCode();
+        var response = ExceptionResponse.builder().code(code).message(e.getMessage()).build();
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(code));
     }
 }

@@ -13,10 +13,15 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class PostPreviewResponse {
+public class PostBriefResponse {
     private long authorId;
     private String title;
-    private String thumbnailUrl;
     private Date updatedAt;
     private Date createdAt;
+    private String thumbnailUrl;
+
+    //likes
+    private long likes; 
+    //혹시 로그인 되었는지 정보 api 하나만 부탁드려도 괜찮을까요?
+    //api/v1/logincheck로 보내주시면 정말 감사드리겠습니다
 }
