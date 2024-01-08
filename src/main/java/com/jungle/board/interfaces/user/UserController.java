@@ -2,6 +2,7 @@ package com.jungle.board.interfaces.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import com.jungle.board.interfaces.user.model.UserSignInResponse;
 import com.jungle.board.interfaces.user.model.UserSignUpRequest;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
@@ -62,7 +64,11 @@ public class UserController {
     @ResponseBody
     public ResponseEntity<UserSignInResponse> signIn(@RequestBody UserSignInRequest request) {
         var token = this.authService.signIn(request.getNickname(), request.getPassword());
-        var response = UserSignInResponse.builder().jwt(token).build();
+        var user = this.userService.getUser(request.getNickname());
+        var response = UserSignInResponse.builder()
+                                         .userId(user.getId())
+                                         .nickname(user.getNickname())
+                                         .jwt(token).build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

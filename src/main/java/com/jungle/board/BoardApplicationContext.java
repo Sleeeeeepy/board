@@ -14,6 +14,7 @@ public class BoardApplicationContext {
         return pollcy.csrf((csrf) -> csrf.disable())
                      .authorizeHttpRequests((auth) -> auth.anyRequest().permitAll())
                      .formLogin((login) -> login.disable())
+                     .cors((cors) -> cors.disable())
                      .build();
     }
 }
