@@ -1,12 +1,13 @@
 package com.jungle.board.infrastructure;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
 import com.jungle.board.domain.user.User;
-import com.jungle.board.infrastructure.jpa.JpaUserRepository;
 import com.jungle.board.domain.user.UserRepository;
+import com.jungle.board.infrastructure.jpa.JpaUserRepository;
 
 @Component
 public class UserRepositoryImpl implements UserRepository {
@@ -31,5 +32,10 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }

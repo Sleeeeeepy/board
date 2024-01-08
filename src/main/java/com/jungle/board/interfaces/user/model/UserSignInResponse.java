@@ -8,5 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class UserSignInResponse {
+    private Long userId;
+    private String nickname;
     private String jwt;
 }

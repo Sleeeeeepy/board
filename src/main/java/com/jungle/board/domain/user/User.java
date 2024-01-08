@@ -6,22 +6,26 @@ import java.util.List;
 import com.jungle.board.domain.post.Post;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Entity(name="user")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity(name = "user")
+@Table(name = "user", indexes = @Index(name = "idx_nickname", columnList = "nickname"))
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +53,9 @@ public class User {
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
     private List<Post> posts;
 
+    @Embedded
+    private RoomPosition roomPosition;
+
     public void publishPost(Post post) {
         posts.add(post);
         post.setAuthor(this);
@@ -58,6 +65,10 @@ public class User {
         this.password = password;
     }
 
+    public void chnageRoomPosition(double x, double y, double z) {
+        this.roomPosition = new RoomPosition(x, y, z);
+    }
+    
     public void setSalt(String salt) {
         this.salt = salt;
     }
