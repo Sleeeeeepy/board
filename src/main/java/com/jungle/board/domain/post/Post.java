@@ -1,9 +1,11 @@
 package com.jungle.board.domain.post;
 
 import java.sql.Date;
+import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.jungle.board.domain.comment.Comment;
 import com.jungle.board.domain.user.User;
 
 import jakarta.persistence.Column;
@@ -14,11 +16,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity(name = "post")
 public class Post {
     @Id
@@ -33,7 +40,7 @@ public class Post {
     @Column(name  = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "text", nullable = false)
     private String content;
 
     @Column(name = "updatedAt", nullable = false)
@@ -49,17 +56,8 @@ public class Post {
     @ColumnDefault("false")
     private Boolean deleted;
 
-    public Post create() {
-        var currentTime = new java.util.Date().getTime();
-        return Post.builder()
-                   .title("")
-                   .content("")
-                   .createdAt(new Date(currentTime))
-                   .updatedAt(new Date(currentTime))
-                   .thumbnailUrl("")
-                   .deleted(false)
-                   .build();                   
-    }
+    @OneToMany(mappedBy="post", fetch = FetchType.LAZY)
+    private List<Comment> comments;
 
     public void setAuthor(User author) {
         this.author = author;
@@ -71,9 +69,10 @@ public class Post {
 
     public void update(String title, String content) {
         this.title = title;
-        this.content = content;
+        this.content = PostUtils.filterContent(content);
         var currentDate = new java.util.Date();
         this.updatedAt = new Date(currentDate.getTime());
+        this.thumbnailUrl = PostUtils.getThumbnailUrlFromContent(this.content);
     }
 
     public void delete() {
