@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
             throw new WebException(HttpStatus.NOT_FOUND, "User " + userId + " dose not exists");
         });
 
-        user.chnageRoomPosition(x, y, z);
+        user.changeRoomPosition(x, y, z);
         userRepository.save(user);
         return user;
     }
