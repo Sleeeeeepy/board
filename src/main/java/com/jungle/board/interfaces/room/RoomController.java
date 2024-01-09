@@ -1,7 +1,7 @@
 package com.jungle.board.interfaces.room;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,25 +34,11 @@ public class RoomController {
     @ResponseBody
     public ResponseEntity<List<RoomResponse>> getRooms() {
         var users = userService.getAllUser();
-        List<RoomResponse> list = new ArrayList<>();
-        for (var user : users) {
-            if (user.getRoomPosition().getX() == 0 &&
-                user.getRoomPosition().getY() == 0 &&
-                user.getRoomPosition().getZ() == 0) {
-                continue;
-            }
-            
-            var response = RoomResponse.builder()
-                                       .userId(user.getId())
-                                       .nickname(user.getNickname())
-                                       .x(user.getRoomPosition().getX())
-                                       .y(user.getRoomPosition().getY())
-                                       .z(user.getRoomPosition().getZ())
-                                       .build();
-            list.add(response);
-        }
-
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        var rooms = users.stream()
+             .filter(user -> user.getRoomPosition() != null)
+             .map(user -> RoomResponse.fromUser(user))
+             .collect(Collectors.toList());
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 
     @PostMapping("/")

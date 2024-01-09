@@ -1,6 +1,7 @@
 package com.jungle.board.interfaces.post;
 
-import java.sql.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,10 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jungle.board.application.AuthService;
 import com.jungle.board.application.PostService;
-import com.jungle.board.domain.post.Post;
+import com.jungle.board.interfaces.common.model.SimpleResponse;
 import com.jungle.board.interfaces.post.model.PostDeleteRequest;
 import com.jungle.board.interfaces.post.model.PostRequest;
 import com.jungle.board.interfaces.post.model.PostResponse;
+import com.jungle.board.interfaces.post.model.PostUpdateRequest;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -36,52 +39,45 @@ public class PostController {
     @ResponseBody
     public ResponseEntity<PostResponse> getPost(@PathVariable Long postId) {
         var post = postService.getPost(postId);
-        var response = PostResponse.builder()
-                                   .authorId(post.getAuthor().getId())
-                                   .title(post.getTitle())
-                                   .body(post.getContent())
-                                   .updatedAt(post.getUpdatedAt())
-                                   .createdAt(post.getCreatedAt())
-                                   .build();
+        var response = PostResponse.fromPost(post);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/")
     @ResponseBody
     public ResponseEntity<PostResponse> publishPost(@RequestBody PostRequest request) {
-        var now = new java.util.Date().getTime();
-        var post = Post.builder()
-                       .title(request.getTitle())
-                       .content(request.getContent())
-                       .createdAt(new Date(now))
-                       .updatedAt(new Date(now))
-                       .deleted(false)
-                       .build();
-                       
-        post = postService.writePost(request.getUserId(), post);
-        var response = PostResponse.builder()
-                                   .authorId(post.getAuthor().getId())
-                                   .title(post.getTitle())
-                                   .body(post.getContent())
-                                   .updatedAt(post.getUpdatedAt())
-                                   .createdAt(post.getCreatedAt())
-                                   .build();
+        authService.verifyUser(request.getUserId(), request.getJwt());
+        var post = postService.writePost(request.getUserId(), request.getTitle(), request.getContent());
+        var response = PostResponse.fromPost(post);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/delete")
+    @PostMapping("/delete/")
     @ResponseBody
-    public ResponseEntity<PostResponse> deletePost(@RequestBody PostDeleteRequest request) {
-        var post = postService.getPost(request.getPostId());
-        postService.deletePost(request.getUserId(), post);
-        var response = PostResponse.builder()
-                           .authorId(post.getAuthor().getId())
-                           .title(post.getTitle())
-                           .body(post.getContent())
-                           .updatedAt(post.getUpdatedAt())
-                           .createdAt(post.getCreatedAt())
-                           .build();
+    public ResponseEntity<SimpleResponse> deletePost(@RequestBody PostDeleteRequest request) {
+        authService.verifyUser(request.getUserId(), request.getJwt());
+        postService.deletePost(request.getPostId());
+        var response = new SimpleResponse("Delete request is processed successfully");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/update/")
+    public ResponseEntity<PostResponse> updatePost(@RequestBody PostUpdateRequest request) {
+        authService.verifyUser(request.getUserId(), request.getJwt());
+        var post = postService.updatePost(request.getPostId(), request.getTitle(), request.getContent());
+        var response = PostResponse.fromPost(post);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/all/{nickname}")
+    public ResponseEntity<List<PostResponse>> getAllPosts(@PathVariable String nickname) {
+        var posts = postService.getAll(nickname);
+        var response = posts.stream()
+                            .filter((post) -> !post.getDeleted())
+                            .map(post -> PostResponse.fromPost(post))
+                            .collect(Collectors.toList());
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
