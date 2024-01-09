@@ -27,4 +27,9 @@ public class CommentRepositoryImpl implements CommentRepository {
     public List<Comment> findAllByPostId(long postId) {
         return commentRepository.findAllByPostId(postId);
     }
+
+    @Override
+    public Comment save(Comment comment) {
+        return commentRepository.save(comment);
+    }
 }

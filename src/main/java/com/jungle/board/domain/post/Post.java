@@ -79,4 +79,10 @@ public class Post {
     public void delete() {
         this.deleted = true;
     }
+
+    public Comment writeComment(String content, User user) {
+        var comment = Comment.create(content, user, this);
+        this.comments.add(comment);
+        return comment;
+    }
 }

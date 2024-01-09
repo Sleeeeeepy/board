@@ -6,4 +6,5 @@ import java.util.Optional;
 public interface CommentRepository {
     Optional<Comment> findById(long id);
     List<Comment> findAllByPostId(long postId);
+    Comment save(Comment comment);
 }

@@ -3,6 +3,7 @@ package com.jungle.board.domain.user;
 import java.sql.Date;
 import java.util.List;
 
+import com.jungle.board.domain.comment.Comment;
 import com.jungle.board.domain.post.Post;
 
 import jakarta.persistence.Column;
@@ -61,11 +62,15 @@ public class User {
         post.setAuthor(this);
     }
 
+    public Comment publishComment(Post post, String content) {
+        return post.writeComment(content, this);
+    }
+
     public void changePassword(String password) {
         this.password = password;
     }
 
-    public void chnageRoomPosition(double x, double y, double z) {
+    public void changeRoomPosition(double x, double y, double z) {
         this.roomPosition = new RoomPosition(x, y, z);
     }
     
